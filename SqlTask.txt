@@ -1,0 +1,111 @@
+
+CREATE TABLE Users (
+    UserID INT PRIMARY KEY IDENTITY(1,1),
+    Name NVARCHAR(50) NOT NULL,
+    Surname NVARCHAR(50) NOT NULL,
+    Username NVARCHAR(50)UNIQUE NOT NULL,
+    Password NVARCHAR(50) UNIQUE NOT NULL ,
+    Gender NVARCHAR(10)
+);
+
+
+CREATE TABLE Artists (
+    ArtistID INT PRIMARY KEY IDENTITY(1,1),
+    Name NVARCHAR(50) NOT NULL,
+    Surname NVARCHAR(50) NOT NULL,
+    Birthday DATE NOT NULL,
+    Gender NVARCHAR(10)
+);
+
+
+CREATE TABLE Categories (
+    CategoryID INT PRIMARY KEY IDENTITY(1,1),
+    Name NVARCHAR(50)
+);
+
+
+CREATE TABLE Musics (
+    MusicID INT PRIMARY KEY IDENTITY(1,1),
+    Name NVARCHAR(100) NOT NULL,
+    Duration TIME,
+    ArtistID INT NOT NULL ,
+    CategoryID INT,
+    FOREIGN KEY (ArtistID) REFERENCES Artists(ArtistID),
+    FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID)
+);
+
+
+CREATE TABLE Playlists (
+    PlaylistID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT,
+    MusicID INT,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID),
+    FOREIGN KEY (MusicID) REFERENCES Musics(MusicID)
+);
+
+
+INSERT INTO Artists (Name, Surname, Birthday, Gender)
+VALUES 
+    ('Shahin', 'Alizada', '2004-08-09', 'Male'),
+    ('Qarib', 'Qaribzade', '2003-01-17', 'Female'), -- QERIBLE BAGLI ZARAFATI BASA DUSDUZ YEQINKI MELLIM :D
+    ('Kenan', 'Mammadzada', '2004-06-22', 'Male');
+
+INSERT INTO Categories (Name)
+VALUES 
+    ('Pop'),
+    ('Rock'),
+    ('Hip Hop'),
+    ('Jazz');
+
+
+
+INSERT INTO Musics (Name, Duration, ArtistID, CategoryID)
+VALUES 
+    ('Breave Heart', '00:02:18', 1, 1), 
+    ('Bakili balasiyam', '00:03:22', 2, 2),
+    ('Gence ve genellee', '00:06:20', 3, 3);
+
+INSERT INTO Users (Name, Surname, Username, Password, Gender)
+VALUES 
+    ('Flora', 'Kerimova', 'ff1212', 'flora123', 'Female'),
+    ('Agadadas', 'Agadadasov', 'aga_ortaliqda', 'Agadadas123', 'Male'),
+    ('Mehemmed', 'Fizuli', 'maqa_qesebe', 'maqalokbatan123', 'Male');
+
+INSERT INTO Playlists (UserID, MusicID)
+VALUES 
+    (1, 1), 
+    (1, 2),
+    (2, 3);
+
+
+
+==================================
+Sorgular
+==================================
+
+
+CREATE VIEW SongDetails AS
+SELECT m.Name AS Mahni_Adi, m.Duration, c.Name AS Category, CONCAT(a.Name, ' ', a.Surname) AS Musiqici_Adi
+FROM Musics m
+INNER JOIN Artists a ON m.ArtistID = a.ArtistID
+INNER JOIN Categories c ON m.CategoryID = c.CategoryID;
+
+SELECT m.Name AS Mahni_Adi, m.Duration, c.Name AS Category, CONCAT(a.Name, ' ', a.Surname) AS Musiqici_Adi
+INNER JOIN Musics m ON p.MusicID = m.MusicID
+INNER JOIN Users u ON p.UserID = u.UserID
+INNER JOIN Artists a ON m.ArtistID = a.ArtistID
+INNER JOIN Categories c ON m.CategoryID = c.CategoryID
+WHERE u.Username = 'ff1212';
+
+SELECT Name AS Mahni_Adi, Duration
+FROM Musics
+ORDER BY Duration;
+
+SELECT CONCAT(a.Name, ' ', a.Surname) AS Musiqici_Adi, COUNT(*) AS Mahni_Sayi
+FROM Musics m
+INNER JOIN Artists a ON m.ArtistID = a.ArtistID
+GROUP BY a.ArtistID, a.Name, a.Surname
+ORDER BY Mahni_Sayi DESC;
+
+
+
